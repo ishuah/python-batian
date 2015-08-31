@@ -4,7 +4,9 @@ from django.db import connection
 from tomorrow import threads
 
 class CatchMiddleware(object):
-	SERVER_URL = 'http://localhost:5000/write_data/'
+
+	def __init__(self, **kwargs):
+		self.SERVER_URL = 'http://localhost:3000/log/'
 	
 	def process_request(self, request):
 		request.start_time = time.time()
@@ -21,38 +23,38 @@ class CatchMiddleware(object):
 		
 		data = [{
 				"measurement": "requests",
-				"tags": {
+				"data": {
 					"app": settings.BATIAN_APP_NAME,
 					"host": request.get_host(),
 					"path": request.get_full_path(),
-					"method": request.method
-				},
-				"fields": {
+					"method": request.method,
 					"status_code": response.status_code,
 					"response_time": time.time() - request.start_time
-				}
+				},
+				"timestamp": int(round(time.time()*1000))
 			}]
 		for query in queries:
 			extract = re.findall('"([^"]*)"', query['sql'])
 			table = extract[0] + "." + extract[1]
 			qdata = {
 				"measurement": "database_queries",
-				"tags": {
+				"data": {
 					"app": settings.BATIAN_APP_NAME,
 					"host": request.get_host(),
 					"path": request.get_full_path(),
-					"table": table
-				},
-				"fields": {
+					"table": table,
 					"response_time": float(query['time'])
-				}
+				},
+				"timestamp": int(round(time.time()*1000))
 			}
 
 			data.append(qdata)
-		requests.post(SERVER_URL, data=json.dumps(data), headers={'content-type': 'application/json'})
+		
+		requests.post(self.SERVER_URL, data=json.dumps(data), headers={'content-type': 'application/json'})
 
 
-	@threads(5)
+
+	@threads(3)
 	def log_exception(self, request, exception):
 		data = [{
 				"measurement": "exceptions",
@@ -67,4 +69,4 @@ class CatchMiddleware(object):
 					"fatal": 1
 				}
 			}]
-		requests.post(SERVER_URL, data=json.dumps(data), headers={'content-type': 'application/json'})
+		requests.post(self.SERVER_URL, data=json.dumps(data), headers={'content-type': 'application/json'})
