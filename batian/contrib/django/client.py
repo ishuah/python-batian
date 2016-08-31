@@ -1,5 +1,6 @@
-from batian.convergence_api import Client
+from batian.batian_api import Client
 import time
+from datetime import datetime
 
 class DjangoClient(Client):
 
@@ -12,8 +13,8 @@ class DjangoClient(Client):
 
 		data = [{
 			"measurement": "requests",
+			"source": self.APP_NAME,
 			"data": {
-				"app": self.APP_NAME,
 				"host": request.get_host(),
 				"path": request.get_full_path(),
 				"method": request.method,
@@ -21,21 +22,21 @@ class DjangoClient(Client):
 				"status_code": response.status_code,
 				"response_time": time.time() - request.start_time
 			},
-			"timestamp": int(round(time.time()*1000))
+			"timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 		}]
 
 		for query in queries:
 			qdata = {
 				"measurement": "database_queries",
+				"source": self.APP_NAME,
 				"data": {
-					"app": self.APP_NAME,
 					"host": request.get_host(),
 					"path": request.get_full_path(),
 					"sql": query['sql'].split('WHERE')[0],
 					"view": view_name,
 					"response_time": float(query['time'])
 				},
-				"timestamp": int(round(time.time()*1000))
+				"timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 			}
 			data.append(qdata)
 			
@@ -46,14 +47,14 @@ class DjangoClient(Client):
 
 		data = [{
 			"measurement": "exceptions",
+			"source": self.APP_NAME,
 			"data": {
-				"app": self.APP_NAME,
 				"host": request.get_host(),
 				"path": request.get_full_path(),
 				"method": request.method,
 				"message": exception.message
 			},
-			"timestamp": int(round(time.time()*1000))
+			"timestamp": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 		}]
 		self.send(data)
 		
