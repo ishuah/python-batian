@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(name='python-batian',
       version='0.1',
-      description='Batian python client.',
+      description='Batian python agent.',
       url='https://github.com/ishuah/python-batian',
       author='Ishuah Kariuki',
       author_email='kariuki@ishuah.com',
