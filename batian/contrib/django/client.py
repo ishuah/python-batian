@@ -1,9 +1,15 @@
 from batian.batian_api import Client
+from django.conf import settings
 import time
 from datetime import datetime
 
 
 class DjangoClient(Client):
+
+    def __init__(self, **kwargs):
+        self.APP_NAME = settings.BATIAN_APP_NAME
+        self.SERVER_URL = settings.BATIAN_SERVER_URL
+       
 
     def _harvest_event(self, rawdata):
         request, response, queries = rawdata
