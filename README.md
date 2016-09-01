@@ -22,7 +22,7 @@ Currently only supports Django. More frameworks will be supported soon.
 After installation, add two variables to your settings.py:
 ```
     BATIAN_APP_NAME = 'myapp'
-    BATIAN_SERVER_URL = 'http://<mybatianserverdomainorport>:<port>/api/v1/event'
+    BATIAN_SERVER_URL = 'http://<mybatianserverdomainorport>:<port>/log'
 ```
 
 Then add batian to your INSTALLED_APPS
